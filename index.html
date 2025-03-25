@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipe & Fittings Dimensions Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .pipe-diagram {
+            max-width: 100%;
+            height: auto;
+        }
+        .tabs-content > div:not(.active) {
+            display: none;
+        }
+        .fitting-img {
+            max-height: 160px;
+            width: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-4 text-blue-800">Process Piping Dimensions Calculator</h1>
+        <p class="text-center text-gray-600 mb-8">Calculate dimensions for pipes and fittings used in process industry</p>
+        
+        <!-- Tabs -->
+        <div class="mb-6 border-b border-gray-200">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="mainTabs">
+                <li class="mr-2">
+                    <a href="#pipes" class="tab-link inline-block p-4 border-b-2 border-blue-600 rounded-t-lg active text-blue-600" aria-current="page">Pipes</a>
+                </li>
+                <li class="mr-2">
+                    <a href="#flanges" class="tab-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">Flanges</a>
+                </li>
+                <li class="mr-2">
+                    <a href="#elbows" class="tab-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">Elbows</a>
+                </li>
+                <li class="mr-2">
+                    <a href="#tees" class="tab-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">Tees</a>
+                </li>
+                <li class="mr-2">
+                    <a href="#reducers" class="tab-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">Reducers</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tabs Content -->
+        <div class="tabs-content">
+            <!-- Pipes Tab -->
+            <div id="pipes" class="active">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Calculator Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Pipe Specifications</h2>
+                        <form id="pipeForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nominal Pipe Size (NPS)</label>
+                                <select id="pipeSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="0.125">1/8"</option>
+                                    <option value="0.25">1/4"</option>
+                                    <option value="0.375">3/8"</option>
+                                    <option value="0.5">1/2"</option>
+                                    <option value="0.75">3/4"</option>
+                                    <option value="1">1"</option>
+                                    <option value="1.25">1-1/4"</option>
+                                    <option value="1.5">1-1/2"</option>
+                                    <option value="2">2"</option>
+                                    <option value="2.5">2-1/2"</option>
+                                    <option value="3">3"</option>
+                                    <option value="4">4"</option>
+                                    <option value="6">6"</option>
+                                    <option value="8">8"</option>
+                                    <option value="10">10"</option>
+                                    <option value="12">12"</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Schedule</label>
+                                <select id="schedule" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="40" selected>40</option>
+                                    <option value="80">80</option>
+                                    <option value="160">160</option>
+                                    <option value="XXS">XXS</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Units</label>
+                                <select id="units" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="inch">Inches</option>
+                                    <option value="mm">Millimeters</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Calculate Dimensions
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Dimensions</h2>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="text-sm">
+                                    <p class="font-medium text-gray-700">Outside Diameter:</p>
+                                    <p id="outsideDiameter" class="text-gray-900">-</p>
+                                </div>
+                                <div class="text-sm">
+                                    <p class="font-medium text-gray-700">Inside Diameter:</p>
+                                    <p id="insideDiameter" class="text-gray-900">-</p>
+                                </div>
+                                <div class="text-sm">
+                                    <p class="font-medium text-gray-700">Wall Thickness:</p>
+                                    <p id="wallThickness" class="text-gray-900">-</p>
+                                </div>
+                                <div class="text-sm">
+                                    <p class="font-medium text-gray-700">Weight per Foot:</p>
+                                    <p id="weightPerFoot" class="text-gray-900">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pipe Diagram -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-semibold mb-2">Pipe Cross Section</h3>
+                            <div class="flex justify-center">
+                                <svg id="pipeDiagram" class="pipe-diagram" width="300" height="200" viewBox="0 0 300 200">
+                                    <circle id="outerCircle" cx="150" cy="100" r="80" fill="none" stroke="#2563eb" stroke-width="2"/>
+                                    <circle id="innerCircle" cx="150" cy="100" r="70" fill="none" stroke="#2563eb" stroke-width="2"/>
+                                    <!-- Wall Thickness Fill -->
+                                    <path id="wallFill" d="M150,20 A80,80 0 1,1 149.9,20 Z" fill="#e0eaff" stroke="none"></path>
+                                    <!-- Dimension Lines -->
+                                    <line x1="150" y1="20" x2="150" y2="180" stroke="#64748b" stroke-width="1" stroke-dasharray="4"/>
+                                    <line x1="250" y1="100" x2="210" y2="100" stroke="#1e40af" stroke-width="1" stroke-dasharray="2"/>
+                                    <line x1="50" y1="100" x2="90" y2="100" stroke="#1e40af" stroke-width="1" stroke-dasharray="2"/>
+                                    <text id="odLabel" x="250" y="100" fill="#1e40af" font-size="12" text-anchor="end">OD</text>
+                                    <text id="idLabel" x="50" y="100" fill="#1e40af" font-size="12" text-anchor="start">ID</text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flanges Tab -->
+            <div id="flanges">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Flange Calculator Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Flange Specifications</h2>
+                        <form id="flangeForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nominal Pipe Size (NPS)</label>
+                                <select id="flangeSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="0.5">1/2"</option>
+                                    <option value="0.75">3/4"</option>
+                                    <option value="1">1"</option>
+                                    <option value="1.5">1-1/2"</option>
+                                    <option value="2">2"</option>
+                                    <option value="3">3"</option>
+                                    <option value="4">4"</option>
+                                    <option value="6">6"</option>
+                                    <option value="8">8"</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Flange Class</label>
+                                <select id="flangeClass" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="150">150</option>
+                                    <option value="300">300</option>
+                                    <option value="600">600</option>
+                                    <option value="900">900</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Flange Type</label>
+                                <select id="flangeType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="slip-on">Slip-On</option>
+                                    <option value="weld-neck">Weld Neck</option>
+                                    <option value="threaded">Threaded</option>
+                                    <option value="blind">Blind</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Units</label>
+                                <select id="flangeUnits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="inch">Inches</option>
+                                    <option value="mm">Millimeters</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Calculate Flange Dimensions
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Flange Results Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Flange Dimensions</h2>
+                        <div class="flex mb-6 justify-center">
+                            <img src="https://images.unsplash.com/photo-1635433759296-fd5230fb3bd7?auto=format&fit=crop&q=80&w=500" alt="Flange Diagram" class="fitting-img object-contain mb-4">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Outside Diameter:</p>
+                                <p id="flangeOutsideDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Bolt Circle Diameter:</p>
+                                <p id="flangeBoltCircleDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Thickness:</p>
+                                <p id="flangeThickness" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Number of Bolts:</p>
+                                <p id="flangeNumberOfBolts" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Bolt Hole Diameter:</p>
+                                <p id="flangeBoltHoleDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Bolt Size:</p>
+                                <p id="flangeBoltSize" class="text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Elbows Tab -->
+            <div id="elbows">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Elbow Calculator Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Elbow Specifications</h2>
+                        <form id="elbowForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nominal Pipe Size (NPS)</label>
+                                <select id="elbowSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="0.5">1/2"</option>
+                                    <option value="0.75">3/4"</option>
+                                    <option value="1">1"</option>
+                                    <option value="1.5">1-1/2"</option>
+                                    <option value="2">2"</option>
+                                    <option value="3">3"</option>
+                                    <option value="4">4"</option>
+                                    <option value="6">6"</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Schedule</label>
+                                <select id="elbowSchedule" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="40">40</option>
+                                    <option value="80">80</option>
+                                    <option value="160">160</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Angle</label>
+                                <select id="elbowAngle" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="45">45°</option>
+                                    <option value="90" selected>90°</option>
+                                    <option value="180">180°</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Radius Type</label>
+                                <select id="elbowRadius" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="short">Short Radius (1D)</option>
+                                    <option value="long" selected>Long Radius (1.5D)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Units</label>
+                                <select id="elbowUnits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="inch">Inches</option>
+                                    <option value="mm">Millimeters</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Calculate Elbow Dimensions
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Elbow Results Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Elbow Dimensions</h2>
+                        <div class="flex mb-6 justify-center">
+                            <img src="https://images.unsplash.com/photo-1626797888736-118e0d384016?auto=format&fit=crop&q=80&w=500" alt="Elbow Diagram" class="fitting-img object-contain mb-4">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Outside Diameter:</p>
+                                <p id="elbowOutsideDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Center to End:</p>
+                                <p id="elbowCenterToEnd" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Radius:</p>
+                                <p id="elbowRadius" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Wall Thickness:</p>
+                                <p id="elbowWallThickness" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Weight:</p>
+                                <p id="elbowWeight" class="text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tees Tab -->
+            <div id="tees">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Tee Calculator Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Tee Specifications</h2>
+                        <form id="teeForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Run Pipe Size (NPS)</label>
+                                <select id="teeRunSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="0.5">1/2"</option>
+                                    <option value="0.75">3/4"</option>
+                                    <option value="1">1"</option>
+                                    <option value="1.5">1-1/2"</option>
+                                    <option value="2">2"</option>
+                                    <option value="3">3"</option>
+                                    <option value="4">4"</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Branch Pipe Size (NPS)</label>
+                                <select id="teeBranchSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="0.5">1/2"</option>
+                                    <option value="0.75">3/4"</option>
+                                    <option value="1">1"</option>
+                                    <option value="1.5">1-1/2"</option>
+                                    <option value="2">2"</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Schedule</label>
+                                <select id="teeSchedule" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="40">40</option>
+                                    <option value="80">80</option>
+                                    <option value="160">160</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tee Type</label>
+                                <select id="teeType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="straight">Straight Tee</option>
+                                    <option value="reducing">Reducing Tee</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Units</label>
+                                <select id="teeUnits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="inch">Inches</option>
+                                    <option value="mm">Millimeters</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Calculate Tee Dimensions
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Tee Results Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Tee Dimensions</h2>
+                        <div class="flex mb-6 justify-center">
+                            <img src="https://images.unsplash.com/photo-1601046760557-808fca43c4ec?auto=format&fit=crop&q=80&w=500" alt="Tee Diagram" class="fitting-img object-contain mb-4">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Run Outside Diameter:</p>
+                                <p id="teeRunOutsideDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Branch Outside Diameter:</p>
+                                <p id="teeBranchOutsideDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Center to End (Run):</p>
+                                <p id="teeRunCenterToEnd" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Center to End (Branch):</p>
+                                <p id="teeBranchCenterToEnd" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Wall Thickness:</p>
+                                <p id="teeWallThickness" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Weight:</p>
+                                <p id="teeWeight" class="text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reducers Tab -->
+            <div id="reducers">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Reducer Calculator Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Reducer Specifications</h2>
+                        <form id="reducerForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Large End Size (NPS)</label>
+                                <select id="reducerLargeSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="0.75">3/4"</option>
+                                    <option value="1">1"</option>
+                                    <option value="1.5">1-1/2"</option>
+                                    <option value="2">2"</option>
+                                    <option value="3">3"</option>
+                                    <option value="4">4"</option>
+                                    <option value="6">6"</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Small End Size (NPS)</label>
+                                <select id="reducerSmallSize" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="0.5">1/2"</option>
+                                    <option value="0.75">3/4"</option>
+                                    <option value="1">1"</option>
+                                    <option value="1.5">1-1/2"</option>
+                                    <option value="2">2"</option>
+                                    <option value="3">3"</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Schedule</label>
+                                <select id="reducerSchedule" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="40">40</option>
+                                    <option value="80">80</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Reducer Type</label>
+                                <select id="reducerType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="concentric">Concentric</option>
+                                    <option value="eccentric">Eccentric</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Units</label>
+                                <select id="reducerUnits" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                    <option value="inch">Inches</option>
+                                    <option value="mm">Millimeters</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Calculate Reducer Dimensions
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Reducer Results Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Reducer Dimensions</h2>
+                        <div class="flex mb-6 justify-center">
+                            <img src="https://images.unsplash.com/photo-1658191002520-f305992c6022?auto=format&fit=crop&q=80&w=500" alt="Reducer Diagram" class="fitting-img object-contain mb-4">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Large End Diameter:</p>
+                                <p id="reducerLargeEndDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Small End Diameter:</p>
+                                <p id="reducerSmallEndDiameter" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Length:</p>
+                                <p id="reducerLength" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Wall Thickness (Large End):</p>
+                                <p id="reducerWallThicknessLarge" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Wall Thickness (Small End):</p>
+                                <p id="reducerWallThicknessSmall" class="text-gray-900">-</p>
+                            </div>
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-700">Weight:</p>
+                                <p id="reducerWeight" class="text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Comprehensive Pipe dimensions database
+        const pipeDimensions = {
+            "0.125": {
+                5: { od: 0.405, thickness: 0.035, weight: 0.19 },
+                10: { od: 0.405, thickness: 0.049, weight: 0.25 },
+                40: { od: 0.405, thickness: 0.068, weight: 0.31 },
+                80: { od: 0.405, thickness: 0.095, weight: 0.38 }
+            },
+            "0.25": {
+                5: { od: 0.540, thickness: 0.049, weight: 0.33 },
+                10: { od: 0.540, thickness: 0.065, weight: 0.43 },
+                40: { od: 0.540, thickness: 0.088, weight: 0.54 },
+                80: { od: 0.540, thickness: 0.119, weight: 0.67 }
+            },
+            "0.375": {
+                5: { od: 0.675, thickness: 0.049, weight: 0.42 },
+                10: { od: 0.675, thickness: 0.065, weight: 0.54 },
+                40: { od: 0.675, thickness: 0.091, weight: 0.74 },
+                80: { od: 0.675, thickness: 0.126, weight: 0.96 }
+            },
+            "0.5": {
+                5: { od: 0.840, thickness: 0.065, weight: 0.67 },
+                10: { od: 0.840, thickness: 0.083, weight: 0.85 },
+                40: { od: 0.840, thickness: 0.109, weight: 1.09 },
+                80: { od: 0.840, thickness: 0.147, weight: 1.47 }
+            },
+            "0.75": {
+                5: { od: 1.050, thickness: 0.065, weight: 0.85 },
+                10: { od: 1.050, thickness: 0.083, weight: 1.09 },
+                40: { od: 1.050, thickness: 0.113, weight: 1.47 },
+                80: { od: 1.050, thickness: 0.154, weight: 1.90 }
+            },
+            "1": {
+                5: { od: 1.315, thickness: 0.065, weight: 1.07 },
+                10: { od: 1.315, thickness: 0.109, weight: 1.68 },
+                40: { od: 1.315, thickness: 0.133, weight: 2.17 },
+                80: { od: 1.315, thickness: 0.179, weight: 2.85 }
+            },
+            "1.25": {
+                5: { od: 1.660, thickness: 0.065, weight: 1.36 },
+                10: { od: 1.660, thickness: 0.109, weight: 2.27 },
+                40: { od: 1.660, thickness: 0.140, weight: 2.93 },
+                80: { od: 1.660, thickness: 0.191, weight: 3.76 }
+            },
+            "1.5": {
+                5: { od: 1.900, thickness: 0.065, weight: 1.60 },
+                10: { od: 1.900, thickness: 0.109, weight: 2.39 },
+                40: { od: 1.900, thickness: 0.145, weight: 3.63 },
+                80: { od: 1.900, thickness: 0.200, weight: 4.86 }
+            },
+            "2": {
+                5: { od: 2.375, thickness: 0.065, weight: 2.07 },
+                10: { od: 2.375, thickness: 0.109, weight: 3.38 },
+                40: { od: 2.375, thickness: 0.154, weight: 5.02 },
+                80: { od: 2.375, thickness: 0.218, weight: 6.91 }
+            }
+        };
+
+        // Flange dimensions database
+        const flangeDimensions = {
+            "0.5": {
+                150: { od: 3.50, bcd: 2.38, thickness: 0.44, bolts: 4, boltHoleDia: 0.62, boltSize: "1/2" },
+                300: { od: 3.75, bcd: 2.62, thickness: 0.56, bolts: 4, boltHoleDia: 0.75, boltSize: "5/8" }
+            },
+            "1": {
+                150: { od: 4.25, bcd: 3.12, thickness: 0.50, bolts: 4, boltHoleDia: 0.62, boltSize: "1/2" },
+                300: { od: 4.88, bcd: 3.50, thickness: 0.69, bolts: 4, boltHoleDia: 0.75, boltSize: "5/8" }
+            },
+            "2": {
+                150: { od: 6.00, bcd: 4.75, thickness: 0.69, bolts: 4, boltHoleDia: 0.75, boltSize: "5/8" },
+                300: { od: 6.50, bcd: 5.00, thickness: 0.81, bolts: 8, boltHoleDia: 0.75, boltSize: "5/8" }
+            }
+        };
+
+        // Document tabs functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabLinks = document.querySelectorAll('.tab-link');
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs
+                    tabLinks.forEach(tab => {
+                        tab.classList.remove('text-blue-600', 'border-blue-600');
+                        tab.classList.add('border-transparent');
+                    });
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('text-blue-600', 'border-blue-600');
+                    this.classList.remove('border-transparent');
+                    
+                    // Show the corresponding content
+                    const tabId = this.getAttribute('href').substring(1);
+                    const tabContents = document.querySelectorAll('.tabs-content > div');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Pipe form submission
+            document.getElementById('pipeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculatePipeDimensions();
+            });
+            
+            // Flange form submission
+            document.getElementById('flangeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateFlangeDimensions();
+            });
+            
+            // Elbow form submission
+            document.getElementById('elbowForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateElbowDimensions();
+            });
+            
+            // Tee form submission
+            document.getElementById('teeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateTeeDimensions();
+            });
+            
+            // Reducer form submission
+            document.getElementById('reducerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateReducerDimensions();
+            });
+
+            // Initialize with default values
+            calculatePipeDimensions();
+        });
+
+        // Unit conversion function
+        function convertUnit(value, toUnit) {
+            if (toUnit === 'mm') {
+                return (value * 25.4).toFixed(2) + ' mm';
+            } else {
+                return value.toFixed(3) + ' in';
+            }
+        }
+
+        // Pipe dimensions calculation
+        function calculatePipeDimensions() {
+            const size = document.getElementById('pipeSize').value;
+            const schedule = document.getElementById('schedule').value;
+            const units = document.getElementById('units').value;
+
+            // Lookup pipe dimensions or calculate if not found in database
+            let od, thickness, weight;
+
+            if (pipeDimensions[size] && pipeDimensions[size][schedule]) {
+                od = pipeDimensions[size][schedule].od;
+                thickness = pipeDimensions[size][schedule].thickness;
+                weight = pipeDimensions[size][schedule].weight;
+            } else {
+                // Fallback calculations for missing data
+                od = parseFloat(size) + 0.5;
+                thickness = (schedule / 1000) * od;
+                weight = Math.PI * thickness * (od - thickness) * 0.2833;
+            }
+
+            const id = od - (2 * thickness);
+
+            // Update the results
+            document.getElementById('outsideDiameter').textContent = convertUnit(od, units);
+            document.getElementById('insideDiameter').textContent = convertUnit(id, units);
+            document.getElementById('wallThickness').textContent = convertUnit(thickness, units);
+            document.getElementById('weightPerFoot').textContent = weight.toFixed(2) + ' lbs/ft';
+
+            // Update the diagram
+            updatePipeDiagram(od, id);
+        }
+
+        // Update pipe diagram
+        function updatePipeDiagram(od, id) {
+            const scale = 80; // Scale factor for visualization
+            const outerRadius = (od/4) * scale;
+            const innerRadius = (id/4) * scale;
+            
+            const outerCircle = document.getElementById('outerCircle');
+            const innerCircle = document.getElementById('innerCircle');
+            
+            outerCircle.setAttribute('r', outerRadius);
+            innerCircle.setAttribute('r', innerRadius);
+            
+            // Update wall fill path
+            const wallFill = document.getElementById('wallFill');
+            wallFill.setAttribute('d', `M150,${100-outerRadius} A${outerRadius},${outerRadius} 0 1,1 149.9,${100-outerRadius} Z`);
+            
+            // Add inner circle cutout by adding a cutout path
+            const svg = document.getElementById('pipeDiagram');
+            let clipPath = document.getElementById('innerClip');
+            if (!clipPath) {
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+                clipPath.setAttribute('id', 'innerClip');
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', '150');
+                circle.setAttribute('cy', '100');
+                circle.setAttribute('r', innerRadius);
+                
+                clipPath.appendChild(circle);
+                defs.appendChild(clipPath);
+                svg.appendChild(defs);
+                
+                wallFill.setAttribute('clip-path', 'url(#innerClip)');
+            } else {
+                const circle = clipPath.querySelector('circle');
+                circle.setAttribute('r', innerRadius);
+            }
+        }
+
+        // Flange dimensions calculation
+        function calculateFlangeDimensions() {
+            const size = document.getElementById('flangeSize').value;
+            const flangeClass = document.getElementById('flangeClass').value;
+            const type = document.getElementById('flangeType').value;
+            const units = document.getElementById('flangeUnits').value;
+
+            // Lookup flange dimensions or use basic approximations
+            let od, bcd, thickness, bolts, boltHoleDia, boltSize;
+
+            if (flangeDimensions[size] && flangeDimensions[size][flangeClass]) {
+                od = flangeDimensions[size][flangeClass].od;
+                bcd = flangeDimensions[size][flangeClass].bcd;
+                thickness = flangeDimensions[size][flangeClass].thickness;
+                bolts = flangeDimensions[size][flangeClass].bolts;
+                boltHoleDia = flangeDimensions[size][flangeClass].boltHoleDia;
+                boltSize = flangeDimensions[size][flangeClass].boltSize;
+            } else {
+                // Fallback calculations for missing data
+                od = parseFloat(size) * 3;
+                bcd = parseFloat(size) * 2;
+                thickness = parseFloat(size) * 0.4;
+                bolts = parseFloat(size) < 3 ? 4 : 8;
+                boltHoleDia = parseFloat(size) < 3 ? 0.62 : 0.75;
+                boltSize = parseFloat(size) < 3 ? "1/2" : "5/8";
+            }
+
+            // Update the results
+            document.getElementById('flangeOutsideDiameter').textContent = convertUnit(od, units);
+            document.getElementById('flangeBoltCircleDiameter').textContent = convertUnit(bcd, units);
+            document.getElementById('flangeThickness').textContent = convertUnit(thickness, units);
+            document.getElementById('flangeNumberOfBolts').textContent = bolts;
+            document.getElementById('flangeBoltHoleDiameter').textContent = convertUnit(boltHoleDia, units);
+            document.getElementById('flangeBoltSize').textContent = boltSize;
+        }
+
+        // Elbow dimensions calculation
+        function calculateElbowDimensions() {
+            const size = document.getElementById('elbowSize').value;
+            const schedule = document.getElementById('elbowSchedule').value;
+            const angle = document.getElementById('elbowAngle').value;
+            const radiusType = document.getElementById('elbowRadius').value;
+            const units = document.getElementById('elbowUnits').value;
+
+            // Lookup pipe dimensions for basic properties
+            let od, thickness, weight;
+
+            if (pipeDimensions[size] && pipeDimensions[size][schedule]) {
+                od = pipeDimensions[size][schedule].od;
+                thickness = pipeDimensions[size][schedule].thickness;
+                weight = pipeDimensions[size][schedule].weight;
+            } else {
+                // Fallback calculations for missing data
+                od = parseFloat(size) + 0.5;
+                thickness = (schedule / 1000) * od;
+                weight = Math.PI * thickness * (od - thickness) * 0.2833;
+            }
+
+            // Calculate elbow-specific dimensions
+            const radiusFactor = radiusType === 'long' ? 1.5 : 1.0;
+            const radius = od * radiusFactor;
+            
+            // Center to end is approximately radius times a factor based on the angle
+            const angleRadians = angle * Math.PI / 180;
+            const centerToEnd = radius * Math.sin(angleRadians / 2);
+            
+            // Elbow weight is approximate and depends on multiple factors
+            // This is a simplified calculation
+            const elbowWeight = weight * radius * (angle / 90) * 1.5;
+
+            // Update the results
+            document.getElementById('elbowOutsideDiameter').textContent = convertUnit(od, units);
+            document.getElementById('elbowCenterToEnd').textContent = convertUnit(centerToEnd, units);
+            document.getElementById('elbowRadius').textContent = convertUnit(radius, units);
+            document.getElementById('elbowWallThickness').textContent = convertUnit(thickness, units);
+            document.getElementById('elbowWeight').textContent = elbowWeight.toFixed(2) + ' lbs';
+        }
+
+        // Tee dimensions calculation
+        function calculateTeeDimensions() {
+            const runSize = document.getElementById('teeRunSize').value;
+            const branchSize = document.getElementById('teeBranchSize').value;
+            const schedule = document.getElementById('teeSchedule').value;
+            const type = document.getElementById('teeType').value;
+            const units = document.getElementById('teeUnits').value;
+
+            // Lookup pipe dimensions for run and branch
+            let runOD, branchOD, thickness, weight;
+
+            if (pipeDimensions[runSize] && pipeDimensions[runSize][schedule]) {
+                runOD = pipeDimensions[runSize][schedule].od;
+                thickness = pipeDimensions[runSize][schedule].thickness;
+                weight = pipeDimensions[runSize][schedule].weight;
+            } else {
+                // Fallback calculations for missing data
+                runOD = parseFloat(runSize) + 0.5;
+                thickness = (schedule / 1000) * runOD;
+                weight = Math.PI * thickness * (runOD - thickness) * 0.2833;
+            }
+
+            if (pipeDimensions[branchSize] && pipeDimensions[branchSize][schedule]) {
+                branchOD = pipeDimensions[branchSize][schedule].od;
+            } else {
+                // Fallback calculations for missing data
+                branchOD = parseFloat(branchSize) + 0.5;
+            }
+
+            // Calculate tee-specific dimensions
+            const runCenterToEnd = 1.5 * runOD;
+            const branchCenterToEnd = runOD + 0.5 * branchOD;
+            
+            // Tee weight is approximate
+            const teeWeight = weight * (runOD + branchOD) * 1.5;
+
+            // Update the results
+            document.getElementById('teeRunOutsideDiameter').textContent = convertUnit(runOD, units);
+            document.getElementById('teeBranchOutsideDiameter').textContent = convertUnit(branchOD, units);
+            document.getElementById('teeRunCenterToEnd').textContent = convertUnit(runCenterToEnd, units);
+            document.getElementById('teeBranchCenterToEnd').textContent = convertUnit(branchCenterToEnd, units);
+            document.getElementById('teeWallThickness').textContent = convertUnit(thickness, units);
+            document.getElementById('teeWeight').textContent = teeWeight.toFixed(2) + ' lbs';
+        }
+
+        // Reducer dimensions calculation
+        function calculateReducerDimensions() {
+            const largeSize = document.getElementById('reducerLargeSize').value;
+            const smallSize = document.getElementById('reducerSmallSize').value;
+            const schedule = document.getElementById('reducerSchedule').value;
+            const type = document.getElementById('reducerType').value;
+            const units = document.getElementById('reducerUnits').value;
+
+            // Lookup pipe dimensions for large and small ends
+            let largeOD, smallOD, largeThickness, smallThickness, weight;
+
+            if (pipeDimensions[largeSize] && pipeDimensions[largeSize][schedule]) {
+                largeOD = pipeDimensions[largeSize][schedule].od;
+                largeThickness = pipeDimensions[largeSize][schedule].thickness;
+            } else {
+                // Fallback calculations for missing data
+                largeOD = parseFloat(largeSize) + 0.5;
+                largeThickness = (schedule / 1000) * largeOD;
+            }
+
+            if (pipeDimensions[smallSize] && pipeDimensions[smallSize][schedule]) {
+                smallOD = pipeDimensions[smallSize][schedule].od;
+                smallThickness = pipeDimensions[smallSize][schedule].thickness;
+                weight = pipeDimensions[smallSize][schedule].weight;
+            } else {
+                // Fallback calculations for missing data
+                smallOD = parseFloat(smallSize) + 0.5;
+                smallThickness = (schedule / 1000) * smallOD;
+                weight = Math.PI * smallThickness * (smallOD - smallThickness) * 0.2833;
+            }
+
+            // Calculate reducer-specific dimensions
+            // Length is typically proportional to the diameter difference
+            const length = (largeOD - smallOD) * 2;
+            
+            // Reducer weight is approximate
+            const reducerWeight = weight * (largeOD + smallOD) / 2;
+
+            // Update the results
+            document.getElementById('reducerLargeEndDiameter').textContent = convertUnit(largeOD, units);
+            document.getElementById('reducerSmallEndDiameter').textContent = convertUnit(smallOD, units);
+            document.getElementById('reducerLength').textContent = convertUnit(length, units);
+            document.getElementById('reducerWallThicknessLarge').textContent = convertUnit(largeThickness, units);
+            document.getElementById('reducerWallThicknessSmall').textContent = convertUnit(smallThickness, units);
+            document.getElementById('reducerWeight').textContent = reducerWeight.toFixed(2) + ' lbs';
+        }
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
